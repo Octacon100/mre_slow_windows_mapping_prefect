@@ -1,24 +1,56 @@
-name: Run Prefect Flow
+name: Test Windows Performance Issue
 
 on: 
-  workflow_dispatch:  # Enables manual trigger
+  workflow_dispatch:
 
 jobs:
-  run-flow:
+  test-windows:
     runs-on: windows-latest
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Run flow in Docker
+    - name: Install uv
+      shell: pwsh
+      run: |
+        irm https://astral.sh/uv/install.ps1 | iex
+        echo "$HOME\.local\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    
+    - name: Create venv and install dependencies
+      shell: pwsh
+      run: |
+        uv venv --python 3.13.1
+        .\.venv\Scripts\Activate.ps1
+        uv pip install prefect==3.6.4 pandas
+    
+    - name: Run test script
+      shell: pwsh
       env:
         PREFECT_API_URL: ${{ secrets.PREFECT_API_URL }}
         PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
-      shell: pwsh
       run: |
-        Get-Content testing_mapping_issues.py | docker run -i `
-          -e PREFECT_API_URL=$env:PREFECT_API_URL `
-          -e PREFECT_API_KEY=$env:PREFECT_API_KEY `
-          -e PREFECT_LOGGING_LEVEL="DEBUG" `
-          --rm prefecthq/prefect:3-python3.12 `
-          uv run --with pandas --with prefect --python 3.13.1 -
+        .\.venv\Scripts\Activate.ps1
+        python testing_mapping_issues.py
+  
+  test-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+    
+    - name: Create venv and install dependencies
+      run: |
+        uv venv --python 3.13.1
+        source .venv/bin/activate
+        uv pip install prefect==3.6.4 pandas
+    
+    - name: Run test script
+      env:
+        PREFECT_API_URL: ${{ secrets.PREFECT_API_URL }}
+        PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+      run: |
+        source .venv/bin/activate       
+        python testing_mapping_issues.py
