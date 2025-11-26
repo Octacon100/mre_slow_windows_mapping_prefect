@@ -16,7 +16,7 @@ jobs:
         PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
       shell: pwsh
       run: |
-        Get-Content your_script.py | docker run -i `
+        Get-Content testing_mapping_issues.py | docker run -i `
           -e PREFECT_API_URL=$env:PREFECT_API_URL `
           -e PREFECT_API_KEY=$env:PREFECT_API_KEY `
           -e PREFECT_LOGGING_LEVEL="DEBUG" `
