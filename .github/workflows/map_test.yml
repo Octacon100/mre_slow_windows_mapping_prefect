@@ -1,6 +1,7 @@
 name: Run Prefect Flow
 
-on: [push]
+on: 
+  workflow_dispatch:  # Enables manual trigger
 
 jobs:
   run-flow:
