@@ -21,7 +21,7 @@ jobs:
       run: |
         uv venv --python 3.13.1
         .\.venv\Scripts\Activate.ps1
-        uv pip install prefect==3.6.4 pandas
+        uv pip install git+https://github.com/PrefectHQ/prefect.git@fix-19581 pandas
     
     - name: Run test script
       shell: pwsh
@@ -45,7 +45,7 @@ jobs:
       run: |
         uv venv --python 3.13.1
         source .venv/bin/activate
-        uv pip install prefect==3.6.4 pandas
+        uv pip install git+https://github.com/PrefectHQ/prefect.git@fix-19581 pandas
     
     - name: Run test script
       env:
